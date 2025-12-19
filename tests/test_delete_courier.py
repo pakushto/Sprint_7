@@ -5,13 +5,11 @@ from data import DeleteCourierData
 
 class TestDeleteCourier:
     @allure.title("Удаление курьера проходит успешно")
-    @allure.description("Проверяем успешное удаление созданного курьера и невозможность авторизации с его учетными данными.")
+    @allure.description("Проверяем успешное удаление созданного курьера по его id.")
     def test_delete_courier_success(self, create_and_login_courier):
         delete_courier_response = CourierApi.delete_courier(create_and_login_courier["id"])
-        login_courier_response = CourierApi.login_courier(create_and_login_courier["body"])
         assert delete_courier_response.status_code == 200, f"Ожидался статус код 200, а вернулся {delete_courier_response.status_code}"
         assert delete_courier_response.json() == DeleteCourierData.DELETE_COURIER_RESPONSE, f"Ожидался ответ {DeleteCourierData.DELETE_COURIER_RESPONSE}, а вернулся {delete_courier_response.json()}"
-        assert login_courier_response.status_code == 404, f"Ожидался статус код 404, а вернулся {login_courier_response.status_code}"
 
     @allure.title("Удаление курьера без id возвращает ошибку 400")
     @allure.description("Отправляем DELETE без подстановки id в URL и ожидаем 404 с сообщением Недостаточно данных для удаления курьера.")

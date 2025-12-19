@@ -1,6 +1,6 @@
 from data import LoginCourierData
 from api.courier_api import CourierApi
-from helper import ChangeTestDataHelper
+from helper import CourierFactory, ChangeTestDataHelper
 import pytest
 import allure
 
@@ -9,7 +9,9 @@ class TestLoginCourier:
     @allure.title("Авторизация курьера проходит успешно")
     @allure.description("Проверяем, что зарегистрированный курьер может успешно авторизоваться и получить id.")
     def test_login_courier_success(self, create_courier, cleanup_courier):
-        response = CourierApi.login_courier(create_courier["body"])
+        body = CourierFactory.default_body_with_random_parameters()
+        create_courier(body)
+        response = CourierApi.login_courier(body)
         cleanup_courier.append(response.json()["id"])
         assert response.status_code == 200, f"Ожидался статус код 200, а вернулся {response.status_code}"
         assert "id" in response.json(), f"В ответе отсутствует поле 'id': {response.json()}"

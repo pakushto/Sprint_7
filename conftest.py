@@ -4,10 +4,33 @@ from api.order_api import OrderApi
 from helper import CourierFactory, OrderFactory
 
 
-@pytest.fixture(scope="function")
-def courier_body():
-    """Генерирует тело курьера со случайными данными."""
-    return CourierFactory.default_body_with_random_parameters()
+@pytest.fixture(scope='function')
+def create_courier():
+    def _create(body):
+        return CourierApi.create_courier(body)
+    return _create
+
+@pytest.fixture(scope='function')
+def login_courier():
+    def _login(body):
+        return CourierApi.login_courier({
+            "login": body["login"],
+            "password": body["password"]
+        })
+    return _login
+
+@pytest.fixture(scope='function')
+def create_and_login_courier(create_courier, login_courier):
+    body = CourierFactory.default_body_with_random_parameters()
+    create_response = create_courier(body)
+    login_response = login_courier(body)
+    courier_id = login_response.json().get("id")
+    return {
+        "id": courier_id,
+        "body": body,
+        "create_response": create_response,
+        "login_response": login_response
+    }
 
 @pytest.fixture(scope='function')
 def cleanup_courier():
@@ -15,33 +38,6 @@ def cleanup_courier():
     yield courier_ids
     for courier_id in courier_ids:
         CourierApi.delete_courier(courier_id=courier_id)
-
-@pytest.fixture(scope='function')
-def login_courier(courier_body):
-    return CourierApi.login_courier(courier_body)
-
-@pytest.fixture(scope='function')
-def create_courier(courier_body):
-    body = courier_body
-    response = CourierApi.create_courier(courier_body)
-    return {
-        "body": body,
-        "response": response
-    }
-
-@pytest.fixture(scope='function')
-def create_and_login_courier(courier_body):
-    CourierApi.create_courier(courier_body)
-    response = CourierApi.login_courier(courier_body)
-    courier_id = response.json()["id"]
-    
-    yield {
-        "response": response,
-        "body": courier_body,
-        "id": courier_id
-    }
-
-    CourierApi.delete_courier(courier_id)
 
 @pytest.fixture(scope='function')
 def create_order():

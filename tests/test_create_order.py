@@ -1,6 +1,6 @@
 from data import CreateOrderData
 from api.order_api import OrderApi
-from helper import ChangeTestDataHelper
+from helper import ChangeTestDataHelper, OrderFactory
 import pytest
 import allure
 
@@ -9,7 +9,7 @@ class TestCreateOrder:
     @allure.title("Создание заказа проходит успешно")
     @allure.description("Проверяем базовый позитивный сценарий создания заказа и получение track.")
     def test_create_order_success(self, finish_order_by_track):
-        create_order_response = OrderApi.create_order(CreateOrderData.CREATE_ORDER_DATA)
+        create_order_response = OrderApi.create_order(OrderFactory.default_body_with_random_parameters())
         finish_order_by_track.append(create_order_response.json()["track"])
         assert create_order_response.status_code == 201, f"Ожидался статус код 201, а вернулся {create_order_response.status_code}"
         assert "track" in create_order_response.text, f"В ответе отсутствует поле 'track': {create_order_response.text}"
