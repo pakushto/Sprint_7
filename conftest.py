@@ -77,15 +77,3 @@ def finish_order_by_track():
         response = OrderApi.get_order_by_track(track=track)
         OrderApi.finish_order(response.json()["order"]["id"])
 
-
-# @pytest.fixture(scope='function')
-# def default_courier():
-#     response = CourierApi.create_courier(CourierFactory.default_body_with_random_parameters())
-
-#     return response
-
-# @pytest.fixture(scope='function')
-# def default_login(default_courier):
-#     body = default_courier.json()
-#     response = CourierApi.login_courier(body)
-#     return response.json()["id"]
